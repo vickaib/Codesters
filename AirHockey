@@ -1,0 +1,124 @@
+background = codesters.Rectangle(0,0,500,500,"black")
+red_goal = codesters.Rectangle(0,240,100,22,"red")
+blue_goal = codesters.Rectangle(0,-240,100,22,"blue")
+board = codesters.Rectangle(0,0,300,460,"white")
+
+p1 = codesters.Circle(0,150,30,"red")
+p2 = codesters.Circle(0,-150,30,"blue")
+
+puck = codesters.Circle(0,0,20,"black")
+puck.set_y_speed(random.choice([-3,3]))
+puck.set_x_speed(random.randint(-2,2))
+
+blue_score = 0
+red_score = 0
+blue_display = codesters.Text("Blue:\n0",200,220,"lightblue")
+red_display = codesters.Text("Red:\n0",-200,220,"red")
+
+
+#Player 1 controls
+def p1_up():
+    if p1.get_top() < 230:
+        p1.move_up(15)
+stage.event_key("w",p1_up)
+
+def p1_down():
+    if p1.get_bottom() > 20:
+        p1.move_down(15)
+stage.event_key("s",p1_down)
+
+def p1_left():
+    if p1.get_left() > -150:
+        p1.move_left(15)
+stage.event_key("a",p1_left)
+
+def p1_right():
+    if p1.get_right() < 150:
+        p1.move_right(15)
+stage.event_key("d",p1_right)
+
+#Player 2 controls
+def p2_up():
+    if p2.get_top() < -20:
+        p2.move_up(15)
+stage.event_key("up",p2_up)
+
+def p2_down():
+    if p2.get_bottom() > -230:
+        p2.move_down(15)
+stage.event_key("down",p2_down)
+
+def p2_left():
+    if p2.get_left() > -150:
+        p2.move_left(15)
+stage.event_key("left",p2_left)
+
+def p2_right():
+    if p2.get_right() < 150:
+        p2.move_right(15)
+stage.event_key("right",p2_right)
+
+def reset():
+    blue_display.set_text("Blue:\n{}".format(blue_score))
+    red_display.set_text("Red:\n{}".format(red_score))
+    puck.go_to(0,0)
+    puck.set_y_speed(0)
+    puck.set_x_speed(0)
+    if red_score >= 7:
+        codesters.Text("Red Wins",0,0,"red")
+        puck.hide()
+    elif blue_score >= 7:
+        codesters.Text("Blue Wins",0,0,"blue")
+        puck.hide()
+    else:
+        stage.wait(2)
+        puck.set_y_speed(random.choice([-3,3]))
+        puck.set_x_speed(random.randint(-2,2))
+
+# collision event for the puck
+def puck_collision(puck,hit_sprite):
+    global red_score, blue_score
+    #handle collision with an edge
+    if hit_sprite is background:
+        if puck.get_left() < -150:
+            puck.set_left(-150)
+            puck.set_x_speed(puck.get_x_speed()*-1)
+        elif puck.get_right() > 150:
+            puck.set_right(150)
+            puck.set_x_speed(puck.get_x_speed()*-1)
+        if puck.get_top() > 230:
+            puck.set_top(230)
+            puck.set_y_speed(puck.get_y_speed()*-1)
+        elif puck.get_bottom() < -230:
+            puck.set_bottom(-230)
+            puck.set_y_speed(puck.get_y_speed()*-1)
+    #handle the puck hitting either player
+    elif hit_sprite is p1 or hit_sprite is p2:
+        if puck.get_x_speed() > 0:
+            if puck.get_x() > hit_sprite.get_x():
+                puck.set_x_speed(puck.get_x_speed()+1)
+            else:
+                puck.set_x_speed((puck.get_x_speed()-1)*-1)
+        else:
+            if puck.get_x() > hit_sprite.get_x():
+                puck.set_x_speed((puck.get_x_speed()-1)*-1)
+            else:
+                puck.set_x_speed(puck.get_x_speed()-1)
+        if puck.get_y_speed() > 0:
+            if puck.get_y() < hit_sprite.get_y():
+                puck.set_y_speed(puck.get_y_speed()*-1)
+        else:
+            if puck.get_y() > hit_sprite.get_y():
+                puck.set_y_speed(puck.get_y_speed()*-1)
+    #Check if the puck hit the red goal
+    elif hit_sprite is red_goal:
+        blue_score += 1
+        reset()
+    #check if the puck hit the blue goal
+    elif hit_sprite is blue_goal:
+        red_score += 1
+        reset()
+puck.event_collision(puck_collision)
+
+
+
