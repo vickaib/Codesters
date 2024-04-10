@@ -1,0 +1,50 @@
+stage.set_gravity(0)
+stage.disable_ceiling()
+stage.set_background("mars")
+
+ground = codesters.Rectangle(0,-240,500,30,"brown")
+ground.set_gravity_off()
+
+player = codesters.Sprite("alien1",-160,-200)
+player.set_size(.3)
+# boolean property to determine if jumping is allowed
+player.can_jump = False
+# set gravity on once everything is created
+stage.set_gravity(10)
+
+def handle_landing(player, platform):
+    player.set_y_speed(0)
+    player.set_bottom(platform.get_top())
+    player.set_gravity_off()
+    player.can_jump = True
+
+def player_collision(player,hit_sprite):
+    if hit_sprite is ground:
+        handle_landing(player,hit_sprite)
+    #handle a collision with a platform
+    elif hit_sprite in platforms:
+        #landed on platform
+        if player.get_y() > hit_sprite.get_top():
+            handle_landing(player,hit_sprite)
+player.event_collision(player_collision)
+
+def jump():
+    if player.can_jump:
+        player.set_y_speed(10)
+        player.set_gravity_on()
+        player.can_jump = False
+stage.event_key("w",jump)
+def left():
+    player.set_x_speed(-5)
+stage.event_key("a",left)
+def right():
+    player.set_x_speed(5)
+stage.event_key("d",right)
+
+def interval():
+    # apply friction
+    player.set_x_speed(player.get_x_speed()*.7)
+stage.event_interval(interval,.05)
+
+
+
