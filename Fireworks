@@ -1,0 +1,53 @@
+# initial setup
+bg = codesters.Rectangle(0, 0, 500, 500, "black")
+stage.disable_all_walls()
+
+# lists of different color themes
+warm = ["Warm", "Crimson", "DarkOrange", "Coral", "Gold", "Yellow", "Goldenrod", "Goldenrod", "Goldenrod"]
+cool = ["Cool", "SeaGreen", "DarkTurquoise", "LightSeaGreen", "SkyBlue", "SlateBlue", "CornflowerBlue", "LightSkyBlue", "DarkCyan"]
+rainbow = ["Rainbow", "red", "orange", "yellow", "green", "blue", "purple"]
+pastel = ["Pastel", "LightPink", "Orange", "Khaki", "LightGreen", "PaleTurquoise", "SkyBlue", "Thistle"]
+vibrant = ["Vibrant", "Orange", "LightGreen", "Red", "Tomato", "Gold", "LightSeaGreen", "DodgerBlue", "MediumSlateBlue"]
+
+# storing all themes in themes list
+themes = []
+themes.append(warm)
+themes.append(cool)
+themes.append(rainbow)
+themes.append(pastel)
+themes.append(vibrant)
+
+# manually choose a theme
+# color_list = vibrant
+
+# randomly choose a theme
+color_list = themes[random.randint(0, (len(themes) - 1))]
+theme_display = codesters.Text("Selected Theme: " + color_list[0], -170, 236, "gray")
+theme_display.set_size(0.6)
+
+# list to keep track of pellets created
+pellets = []
+
+# create firework effect when the screen is clicked
+def click_up():
+    mouse_x = stage.click_x()
+    mouse_y = stage.click_y()
+    for i in range(random.randint(15, 100)): 
+        pellet = codesters.Circle(mouse_x, mouse_y, 10, color_list[random.randint(1, (len(color_list) - 1))])
+        #pellet = codesters.Sprite("candy")
+        pellet.set_x_speed(random.randint(1, 10) * random.choice([-1,1]))
+        pellet.set_y_speed(random.randint(1, 10) * random.choice([-1,1]))
+        pellets.append(pellet)
+stage.event_click_up(click_up)
+
+# removes sprites that are no longer visible
+def check_position():
+    lb = -240
+    ub = 240
+    for pellet in pellets:
+        if pellet.get_x() <= lb or pellet.get_x() >= ub or pellet.get_y() <= lb or pellet.get_y() >= ub:
+            stage.remove_sprite(pellet)
+stage.event_interval(check_position, 0.1)
+
+
+
