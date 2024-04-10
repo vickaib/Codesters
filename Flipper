@@ -1,0 +1,67 @@
+# Phase 1
+sea_level = 40 # the y position of the top of the water rectangle
+water_depth = 1000 # the height of the water rectangle
+sky_color = "lavender"
+water_color = "MediumAquamarine"
+ground_color = "brown"
+shark_flips = 0
+high_score = 0
+
+sky = codesters.Rectangle(0, 0, 500, 500, sky_color)
+water = codesters.Rectangle(0, 0, 500, water_depth, water_color)
+water.set_top(sea_level)
+ground = codesters.Rectangle(0, 0, 500, 500, ground_color)
+ground.set_top(sea_level - water_depth)
+
+shark_flips_text = codesters.Text("flips", -200, 200)
+high_score_text = codesters.Text("high score", 150, 200)
+
+shark = codesters.Sprite("shark")
+shark.set_size(0.4)
+
+# Phase 2
+
+shark_swim_power = 10 # linear acceleration of the shark 
+shark_y_speed = 0
+shark_spin_power = 1 # rotational acceleration of the shark
+shark_rotation_speed = 0
+
+def up_key():
+    global shark_y_speed
+    if sea_level > 0: # the shark can only swim forward while underwater
+        shark_y_speed += math.sin(shark.get_rotation() * math.pi / 180) * shark_swim_power
+stage.event_key("up", up_key)
+
+def left_key():
+    global shark_rotation_speed
+    shark_rotation_speed += shark_spin_power
+stage.event_key("left", left_key)
+
+def right_key():
+    global shark_rotation_speed
+    shark_rotation_speed -= shark_spin_power
+stage.event_key("right", right_key)
+
+# PHase 3
+def main():
+    global sea_level, shark_y_speed, shark_rotation_speed, shark_flips, high_score
+    sea_level -= shark_y_speed
+    water.set_top(sea_level)
+    ground.set_top(sea_level - water_depth)
+    shark.set_rotation(shark.get_rotation() + shark_rotation_speed)
+    if sea_level > water_depth: # hitting ground
+        shark_y_speed = abs(shark_y_speed * 0.5)
+    elif sea_level > 0: # underwater
+        high_score = max(high_score, shark_flips)
+        shark_rotation_speed *= 0.95
+        shark_y_speed *= 0.900000000
+        shark_flips = 0
+    else: # airborne shark
+        shark_y_speed -= 0.4 # gravity
+        shark_flips += abs(shark_rotation_speed / 360.0)
+    shark_flips_text.set_text("flips " + str(round(shark_flips,1)))
+    high_score_text.set_text("high score " + str(round(high_score,1)))
+stage.event_interval(main, 0.03)
+
+
+
